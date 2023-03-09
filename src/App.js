@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import "./scss/main.css"
+import 로고 from "./asset/logo-komapper.png"
+import Map from "./components/Map";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+    {/* header 부분입니다 */}
+      <div className="header">
+        <div className="header_logo">
+          <img src={로고} alt="(주)코매퍼 로고" width={"150"} height={"25.34"}/>
+        </div>
+        <div className="header_version">for LAND</div>
+      </div>
+
+    {/* left panel & 메인지도 부분입니다 */}
+      <div className="systemContainer">
+        <div className="leftPanelContainer">
+          <div className="leftPanelTab"></div>
+          <div className="leftPanelMain"> </div>
+        </div>
+        <div className="map">
+
+        {/* GoogleMap 컴포넌트 */}
+          <Map />
+        </div>
+      </div>
     </div>
   );
 }

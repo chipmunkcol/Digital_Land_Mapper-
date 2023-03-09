@@ -1,0 +1,14 @@
+.header {
+  width: 100%;
+  height: 60px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+
+  &_version {
+   margin-left: 8px; 
+   color: #a3a3a3;
+   font-size: 15px;
+   font-weight: 600;
+  }
+}
