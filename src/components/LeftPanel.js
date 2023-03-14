@@ -38,8 +38,6 @@ const getOrthoPhotoHandler = () => {
     },
     layerId,
   }))
-  
-console.log('layerLng: ', layerLat, layerLng);
 }
 
   return(

@@ -21,7 +21,7 @@ const singInHandler = (e) => {
 
   const data = {
     id: id,
-    pw: encrypt(pw)
+    password: encrypt(pw)
   }
   console.log(data);
   
@@ -29,7 +29,8 @@ const singInHandler = (e) => {
   .then((res) => {
     const data = res.data;
     if(data.result) {
-      console.log('로그인 완료' + res);
+      console.log('로그인 완료');
+      setLoginModal(false);
     } else {
       alert(data.message);
       console.log(data.message);

@@ -5,6 +5,7 @@ import "../scss/main.css"
 import axios from "axios";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { centerState, mapState } from "../store/common";
+import { axiosPost } from "../api/core";
 axios.defaults.withCredentials = true;
 
 const mapStyle = {
@@ -15,7 +16,7 @@ const mapStyle = {
 let orthoPhoth; // 변수 값 최상단으로!
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
-    id: process.env.REACT_APP_MAP_ID,
+    // id: process.env.REACT_APP_MAP_ID,
     googleMapsApiKey: process.env.REACT_APP_MAP_API_KEY
   });
 
@@ -59,6 +60,8 @@ function refreshMap(map) {
   const height = map.getDiv().offsetHeight;
 
   getOrthoPhoto(map, bounds2, width, height);
+
+  setAIResultList(map, bounds2);
 }
 
 const getOrthoPhoto = (map, bound, width, heigth) => {
@@ -78,6 +81,20 @@ const getOrthoPhoto = (map, bound, width, heigth) => {
   }
 }
 
+function setAIResultList(map, bounds) { // 로그인 후 구현할것
+  const url = '/mosaic/get-ai-result-feature-list.do';
+  const data = { bounds };
+
+  axiosPost(url, data)
+  .then((res) => {
+    const features = res.data.aiResultFeatureList;
+
+  })
+  .catch((res) => {
+    console.log(res)
+  })
+}
+
 const ToggleOrthoPhothHandler = () => {
   if (!toggleOrthoPhoth) {
     orthoPhoth.setOpacity(0);
@@ -87,6 +104,7 @@ const ToggleOrthoPhothHandler = () => {
     setToggleOrthoPhoth(false);
   }
 }
+
 
   return( isLoaded && 
       <GoogleMap
@@ -118,18 +136,3 @@ function getUrl(layerId, bbox, width, height) {
           + '&BBOX=' + bbox;
 }
 
-
-// function setAIResultList(map, bounds) { // 로그인 후 구현할것
-//   const url = process.env.REACT_APP_CONTEXT_PATH + '/mosaic/get-ai-result-feature-list.do';
-//   const data = { bounds };
-
-//   axios.post(url, data)
-//   .then((res) => {
-//     const features = res.data.aiResultFeatureList;
-//     console.log('features: ', features);
-
-//   })
-//   .catch((res) => {
-//     console.log(res)
-//   })
-// }

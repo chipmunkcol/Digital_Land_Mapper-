@@ -32,22 +32,22 @@
 
 .login_modal {
   position: fixed;
-top: 10%;
-left: 0;
-right: 0;
-margin: 0 auto;
-width: 300px;
-max-height: 80vh;
-overflow: auto;
-background-color: white;
-color: black;
-padding: 2rem;
-border-radius: 14px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-z-index: 30;
-display: flex;
-justify-content: center;
-align-items: center;
+  top: 10%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 250px;
+  max-height: 80vh;
+  overflow: auto;
+  background-color: white;
+  color: black;
+  padding: 2rem 0rem 2rem 0rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .login_input {
     margin-top: 10px;
   }
@@ -55,8 +55,7 @@ align-items: center;
     margin-top: 10px;
   }
   .login_btn {
-    margin-top: 20
-    px;
+    margin-top: 20px;
     background-color: #b532b5;
     color: white;
     font-size: 16px;

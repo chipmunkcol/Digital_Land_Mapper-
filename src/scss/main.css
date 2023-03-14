@@ -34,12 +34,12 @@
   left: 0;
   right: 0;
   margin: 0 auto;
-  width: 300px;
+  width: 250px;
   max-height: 80vh;
   overflow: auto;
   background-color: white;
   color: black;
-  padding: 2rem;
+  padding: 2rem 0rem 2rem 0rem;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   z-index: 30;
@@ -54,7 +54,7 @@
   margin-top: 10px;
 }
 .login_modal .login_btn {
-  margin-top: 20 px;
+  margin-top: 20px;
   background-color: #b532b5;
   color: white;
   font-size: 16px;

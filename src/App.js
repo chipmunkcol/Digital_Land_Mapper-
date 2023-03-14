@@ -20,8 +20,8 @@ function App() {
       <div className="header">
         <div className="header_logo">
           <img src={로고} alt="(주)코매퍼 로고" width={"150"} height={"25.34"}/>
-          <span className="header_version">for LAND</span>
         </div>
+        <span className="header_version">for LAND</span>
         <div className="login">
           <span onClick={loginHandler}>LOGIN</span>
         </div>
@@ -41,8 +41,6 @@ function App() {
 
         {/* GoogleMap 컴포넌트 */}
           <Map />
-          {/* <Map2 /> */}
-          {/* <Map3 /> */}
         </div>
       </div>
 
