@@ -1,4 +1,4 @@
-import { atom } from "recoil";
+import { atom, selector } from "recoil";
 
 const initialState = {
   target: { lat: 35.287655241484075, lng: 126.68514455541904,  },
@@ -14,4 +14,9 @@ export const mapState = atom({
   key:'mapState',
   default: {},
   dangerouslyAllowMutability: true,
+})
+
+export const drawingManager = atom({
+  key:'drawingManager',
+  default: false,
 })

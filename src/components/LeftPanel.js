@@ -1,6 +1,7 @@
+import '../scss/main.css'
 import { useSetRecoilState } from "recoil";
 import { layerList } from "../db/data";
-import { centerState } from "../store/common";
+import { centerState, drawingManager } from "../store/common";
 
 const LeftPanel = () => {
 
@@ -21,6 +22,16 @@ const LeftPanel = () => {
 export default LeftPanel;
 
 function LayerList({ layer }) {
+
+// const useState()
+
+const setDrawingManager = useSetRecoilState(drawingManager);
+
+const onClickTemplate = (layerId) => {
+  // if(layer.layerId === layerId) {
+    setDrawingManager((prev) => !prev);
+  // }
+}
 
 const layerId = layer.layerId;
 const layerName = layer.name;
@@ -44,6 +55,15 @@ const getOrthoPhotoHandler = () => {
     <div className="layer_box" onClick={getOrthoPhotoHandler}>
       <div className="layer_title">{layerName}</div>
       <div className="layer_address">{layerAdress}</div>
+      <div className="layer_btn_box">
+        <button className="layer_btn" 
+          onClick={(e)=>{
+            e.stopPropagation();
+            onClickTemplate(layer.layerId)
+            }}>
+              편집
+        </button>
+      </div>
     </div>
   )
 }

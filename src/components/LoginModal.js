@@ -1,6 +1,6 @@
 import "../scss/main.css"
 import { useRef } from "react";
-import { axiosPost } from "../api/core";
+import { axiosPost, _axiosPost } from "../api/core";
 import { encrypt } from "../hooks/aes256";
 
 

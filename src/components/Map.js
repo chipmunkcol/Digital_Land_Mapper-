@@ -4,7 +4,7 @@ import { useState } from "react";
 import "../scss/main.css"
 import axios from "axios";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { centerState, mapState } from "../store/common";
+import { centerState, drawingManager, mapState } from "../store/common";
 import { axiosPost } from "../api/core";
 axios.defaults.withCredentials = true;
 
@@ -14,10 +14,13 @@ const mapStyle = {
 }
 
 let orthoPhoth; // 변수 값 최상단으로!
+let polygonBuild;
+let polygonLoad;
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
     // id: process.env.REACT_APP_MAP_ID,
-    googleMapsApiKey: process.env.REACT_APP_MAP_API_KEY
+    googleMapsApiKey: process.env.REACT_APP_MAP_API_KEY,
+    libraries:['drawing']
   });
 
   const [zoom, setZoom] = useState(18);
@@ -26,6 +29,8 @@ const Map = () => {
   const targetLayerId = useRecoilValue(centerState);
   const center = targetLayerId.target;
   const layerId = targetLayerId.layerId;
+  const dm = useRecoilValue(drawingManager);
+  console.log('dm: ', dm);
 
 const onLoadMap = useCallback((map) => {
   // center 로 보낼 때 사용할것.
@@ -34,10 +39,37 @@ const onLoadMap = useCallback((map) => {
   // map.fitBounds(bounds);
   
   setMapObj(map);
+  drawingManagerHandler(map);
 }, [])
+
+const drawingManagerHandler = (map) => {
+  const _dm = new window.google.maps.drawing.DrawingManager({
+    drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
+    drawingControl: true,
+    drawingControlOptions: {
+      drawingModes: [
+        window.google.maps.drawing.OverlayType.POLYGON
+      ],
+    },
+    polygonOptions: {
+      fillColor: '#ffff00',
+      clickable: false,
+      editable: true,
+      zIndex: 999
+    }
+  })
+  _dm.setMap(map);
+}
+
 
 const cleanUpOverlay = () => {
   if(orthoPhoth) orthoPhoth.setMap(null);
+}
+const cleanUpPolygonBuild = () => {
+  if(polygonBuild) polygonBuild.setMap(null);
+}
+const cleanUpPolygonLoad = () => {
+  if(polygonLoad) polygonLoad.setMap(null);
 }
 const onIdleMap = () => {
   // if (!orthoPhotoEnd) 
@@ -59,8 +91,9 @@ function refreshMap(map) {
   const width = map.getDiv().offsetWidth;
   const height = map.getDiv().offsetHeight;
 
+  if(!toggleOrthoPhoth) {
   getOrthoPhoto(map, bounds2, width, height);
-
+  }
   setAIResultList(map, bounds2);
 }
 
@@ -81,14 +114,68 @@ const getOrthoPhoto = (map, bound, width, heigth) => {
   }
 }
 
-function setAIResultList(map, bounds) { // 로그인 후 구현할것
+function setAIResultList(map, bounds) {
   const url = '/mosaic/get-ai-result-feature-list.do';
   const data = { bounds };
 
   axiosPost(url, data)
   .then((res) => {
-    const features = res.data.aiResultFeatureList;
 
+    const features = res.data.aiResultFeatureList;
+    const ai_build = [...features.ail_buld_gt];
+    const ai_road = [...features.ail_road_gt];
+
+    // ai build 폴리곤 띄워주기
+    for (let i = 0; i<ai_build.length; i++) {
+       const boundsArr = JSON.parse(ai_build[i].geojson).coordinates[0][0];
+       const color = JSON.parse(ai_build[0].etc).color;
+       let bounds = [];
+       
+      //  cleanUpPolygonBuild();
+       for (let j = 0; j<boundsArr.length; j++) {
+         const lng = boundsArr[j][0];
+         const lat = boundsArr[j][1];
+         bounds.push({lat, lng})
+       }
+      
+      polygonBuild = new window.google.maps.Polygon({
+        map: map,
+        paths: bounds,
+        strokeColor: "#000000",
+        strokeWeight: 1,
+        fillColor: color,
+        fillOpacity: 1,
+        zIndex: 900,
+        editable: dm,
+        draggable: dm,
+      })
+    }
+
+    // ai road 폴리곤 띄워주기
+    for (let i = 0; i<ai_road.length; i++) {
+      const boundsArr = JSON.parse(ai_road[i].geojson).coordinates[0][0];
+      const color = JSON.parse(ai_road[0].etc).color;
+      let bounds = [];
+
+      // cleanUpPolygonLoad();
+      for (let j = 0; j<boundsArr.length; j++) {
+        const lng = boundsArr[j][0];
+        const lat = boundsArr[j][1];
+        bounds.push({lat, lng})
+      }
+      
+      polygonLoad = new window.google.maps.Polygon({
+       map: map,
+       paths: bounds,
+       strokeColor: "#000000",
+       strokeWeight: 1,
+       fillColor: color,
+       fillOpacity: 1,
+       zIndex: 900,
+       editable: dm,
+       draggable: dm,
+     })
+   }
   })
   .catch((res) => {
     console.log(res)
@@ -119,6 +206,7 @@ const ToggleOrthoPhothHandler = () => {
         <div className="orthoPhotoBox">
           <button onClick={ToggleOrthoPhothHandler}>정사영상 {!toggleOrthoPhoth ? '끄기' : '켜기'}</button>
         </div>
+
       </GoogleMap>
   )
 }

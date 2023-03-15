@@ -71,7 +71,7 @@
 .layer_box {
   width: 100%;
   height: 100px;
-  padding: 7%;
+  padding: 10px;
   border-bottom: 1px solid rgb(216, 216, 216);
 }
 .layer_box .layer_title {
@@ -80,7 +80,16 @@
 }
 .layer_box .layer_address {
   font-size: 15px;
-  margin-top: 14px;
+  margin-top: 10px;
+}
+.layer_box .layer_btn_box {
+  display: flex;
+  margin-top: 10px;
+}
+.layer_box .layer_btn_box .layer_btn {
+  width: 30%;
+  height: 30px;
+  cursor: pointer;
 }
 
 .orthoPhotoBox {
