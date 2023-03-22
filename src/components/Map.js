@@ -13,33 +13,42 @@ const mapStyle = {
   height: '100%',
 }
 
+const libraries = ['drawing']
+
 let orthoPhoth; // 변수 값 최상단으로!
 let polygonBuild;
 let polygonLoad;
+let loadArr = [];
+let buildArr = [];
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
-    // id: process.env.REACT_APP_MAP_ID,
     googleMapsApiKey: process.env.REACT_APP_MAP_API_KEY,
-    libraries:['drawing']
+    libraries,
   });
 
-  const [zoom, setZoom] = useState(18);
+  const [zoom, setZoom] = useState(17);
   const [mapObj, setMapObj] = useRecoilState(mapState);
   const [toggleOrthoPhoth, setToggleOrthoPhoth] = useState(false);
   const targetLayerId = useRecoilValue(centerState);
   const center = targetLayerId.target;
   const layerId = targetLayerId.layerId;
+  // const [buildArr, setBuildArr] = useState([]);
+  // const [loadArr, setLoadArr] = useState([]); 
+
   const dm = useRecoilValue(drawingManager);
   console.log('dm: ', dm);
+  const mapRef = useRef(null);
+  
+  useEffect(()=>{
+    if(mapRef?.current) {
+      refreshMap(mapObj);
+    }
+
+  },[dm])
 
 const onLoadMap = useCallback((map) => {
-  // center 로 보낼 때 사용할것.
-  // const bounds = new window.google.maps.LatLngBounds(center);
-  // console.log('bounds: ', bounds);
-  // map.fitBounds(bounds);
-  
   setMapObj(map);
-  drawingManagerHandler(map);
+  // drawingManagerHandler(map);
 }, [])
 
 const drawingManagerHandler = (map) => {
@@ -61,20 +70,6 @@ const drawingManagerHandler = (map) => {
   _dm.setMap(map);
 }
 
-
-const cleanUpOverlay = () => {
-  if(orthoPhoth) orthoPhoth.setMap(null);
-}
-const cleanUpPolygonBuild = () => {
-  if(polygonBuild) polygonBuild.setMap(null);
-}
-const cleanUpPolygonLoad = () => {
-  if(polygonLoad) polygonLoad.setMap(null);
-}
-const onIdleMap = () => {
-  // if (!orthoPhotoEnd) 
-  refreshMap(mapObj);
-}
 
 function refreshMap(map) {
   const bounds = map.getBounds();
@@ -126,12 +121,12 @@ function setAIResultList(map, bounds) {
     const ai_road = [...features.ail_road_gt];
 
     // ai build 폴리곤 띄워주기
+    cleanUpPolygonBuild();
     for (let i = 0; i<ai_build.length; i++) {
        const boundsArr = JSON.parse(ai_build[i].geojson).coordinates[0][0];
        const color = JSON.parse(ai_build[0].etc).color;
        let bounds = [];
        
-      //  cleanUpPolygonBuild();
        for (let j = 0; j<boundsArr.length; j++) {
          const lng = boundsArr[j][0];
          const lat = boundsArr[j][1];
@@ -149,22 +144,27 @@ function setAIResultList(map, bounds) {
         editable: dm,
         draggable: dm,
       })
+      buildArr.push({
+        id: i,
+        polygonBuild
+      })
+
     }
 
     // ai road 폴리곤 띄워주기
+    cleanUpPolygonLoad();
     for (let i = 0; i<ai_road.length; i++) {
       const boundsArr = JSON.parse(ai_road[i].geojson).coordinates[0][0];
       const color = JSON.parse(ai_road[0].etc).color;
       let bounds = [];
 
-      // cleanUpPolygonLoad();
       for (let j = 0; j<boundsArr.length; j++) {
         const lng = boundsArr[j][0];
         const lat = boundsArr[j][1];
         bounds.push({lat, lng})
       }
       
-      polygonLoad = new window.google.maps.Polygon({
+      const polygonLoad = new window.google.maps.Polygon({
        map: map,
        paths: bounds,
        strokeColor: "#000000",
@@ -174,6 +174,10 @@ function setAIResultList(map, bounds) {
        zIndex: 900,
        editable: dm,
        draggable: dm,
+     })
+     loadArr.push({
+      id: i,
+      polygonLoad
      })
    }
   })
@@ -192,6 +196,28 @@ const ToggleOrthoPhothHandler = () => {
   }
 }
 
+function cleanUpOverlay() {
+  if(orthoPhoth) orthoPhoth.setMap(null);
+}
+function cleanUpPolygonBuild() {
+  if(buildArr.length !== 0) {  
+    for (let i=0; i<buildArr.length; i++) {
+      buildArr[i].polygonBuild.setMap(null);
+    }
+    buildArr = [];
+  }
+}
+function cleanUpPolygonLoad() {
+  if(loadArr.length !== 0) {  
+    for (let i=0; i<loadArr.length; i++) {
+      loadArr[i].polygonLoad.setMap(null);
+    }
+    loadArr = [];
+  }
+}
+function onIdleMap() {
+  if (!dm) refreshMap(mapObj);
+}
 
   return( isLoaded && 
       <GoogleMap
@@ -201,6 +227,7 @@ const ToggleOrthoPhothHandler = () => {
         mapTypeId={ "hybrid" }
         onLoad={ onLoadMap }
         onIdle={ onIdleMap }
+        ref={mapRef}
       >
       {/* 정사영상 toggle btn */}
         <div className="orthoPhotoBox">

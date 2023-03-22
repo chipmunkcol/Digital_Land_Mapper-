@@ -17,5 +17,10 @@
   "start": "set PORT=80 && react-scripts start",
 }
 ```
-4. polygon google map에 불러오기
+5. polygon google map에 불러오기
+  - 불러오는건 어렵지 않았는데 refresh 시켜주는데 혼났다.. 
+  - 편집모드로 바꿀때 객체를 바꿀껀지 새로 그려줄건지에 따라 코드차이가 나는거 같은데 고민해보자
+
+6. react js pagination
+
 

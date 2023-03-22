@@ -2,20 +2,43 @@ import '../scss/main.css'
 import { useSetRecoilState } from "recoil";
 import { layerList } from "../db/data";
 import { centerState, drawingManager } from "../store/common";
+import { useEffect, useState } from 'react';
+import Pagination from 'react-js-pagination';
 
 const LeftPanel = () => {
 
+  // Pagination 구현하기
+  const [page, setPage] = useState(1);
+  const [item, setItem] = useState(layerList);
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  }
+  const totalCount = item.length;
+
   return(
+    <>
     <div className="leftPanel">
       {
-        layerList.map((layer) => 
+        item.slice((page - 1) * 8, page * 8).map((layer) => 
           <LayerList 
             key={layer.layerId}
             layer={layer}
           />
         )
       }
+      <Pagination 
+        activePage={ page }
+        itemsCountPerPage={8}
+        totalItemsCount={ totalCount }
+        pageRangeDisplayed={5}
+        prevPageText={"<"}
+        nextPageText={">"}
+        onChange={ handlePageChange }
+      />
+
     </div>
+    </>
   )
 }
 
@@ -68,19 +91,24 @@ const getOrthoPhotoHandler = () => {
   )
 }
 
-// function getLayerList(sidCode, sggCode, query) { 로그인 후 구현할것!
-//   const url = '/mosaic/get-orthophoto-list.do';
-//   const data = {
-//     sidCode,
-//     sggCode,
-//     searchQuery: query
-//   }
 
-//   axiosPost(url, data)
-//   .then((res) => {
-//     console.log('res: ', res);
-//   })
-//   .catch((res) => {
-//     console.log('res: ', res);
-//   })
+
+// const [isActive, setIsActive] = useState(null);
+// // const paginationArr = [1,2,3,4,5,6];
+
+// // 클릭한 index만 넘겨줘서 index 번호로 클릭 한 거 구분해주자 
+// const onclickActive = (index) => {
+//   setIsActive(index);
 // }
+
+// {
+//   paginationArr.map((number, index) => (
+//     <span
+//       key={number} 
+//       className={`page ${isActive === index ? 'active' : ''}`}
+//       onClick={ () => {onclickActive(index)} }
+//     >
+//       [{number}]
+//     </span>
+//   ))
+// } 

@@ -1,6 +1,14 @@
 .leftPanel {
   width: 100%;
   height: 100%;
+  overflow: auto;
+
+  .page{
+    font-size: 20px;
+  }
+  .page.active  {
+    color: pink;
+  }
 }
 
 .layer_box {
