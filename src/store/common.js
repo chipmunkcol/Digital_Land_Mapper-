@@ -20,3 +20,8 @@ export const drawingManager = atom({
   key:'drawingManager',
   default: false,
 })
+
+export const modalState = atom({
+  key: 'modalState',
+  default: false,
+})

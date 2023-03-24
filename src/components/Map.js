@@ -1,5 +1,5 @@
 import React, { Component, useCallback, useEffect, useRef } from "react";
-import { Autocomplete, BicyclingLayer, DrawingManager, DrawingManagerF, GoogleMap, GroundOverlay, HeatmapLayer, KmlLayer, LoadScript, StreetViewPanorama, TrafficLayer, TransitLayer, useJsApiLoader,  } from "@react-google-maps/api";
+import { DrawingManager, DrawingManagerF, GoogleMap, useJsApiLoader,  } from "@react-google-maps/api";
 import { useState } from "react";
 import "../scss/main.css"
 import axios from "axios";
@@ -16,8 +16,6 @@ const mapStyle = {
 const libraries = ['drawing']
 
 let orthoPhoth; // 변수 값 최상단으로!
-let polygonBuild;
-let polygonLoad;
 let loadArr = [];
 let buildArr = [];
 const Map = () => {
@@ -32,23 +30,35 @@ const Map = () => {
   const targetLayerId = useRecoilValue(centerState);
   const center = targetLayerId.target;
   const layerId = targetLayerId.layerId;
-  // const [buildArr, setBuildArr] = useState([]);
-  // const [loadArr, setLoadArr] = useState([]); 
 
   const dm = useRecoilValue(drawingManager);
-  console.log('dm: ', dm);
   const mapRef = useRef(null);
   
-  useEffect(()=>{
-    if(mapRef?.current) {
-      refreshMap(mapObj);
-    }
+  const editPolygonHandler = (dm) => {
+      loadArr.forEach((load, index) => {
+        load.polygonLoad.setOptions({
+          editable: dm,
+          draggable: dm,
+        })
+      });
+      buildArr.forEach((build, index) => {
+        build.polygonBuild.setOptions({
+          editable: dm,
+          draggable: dm,
+        })
+      });
+  }
 
+  useEffect(()=>{
+    if( loadArr.length !== 0 ) {
+      editPolygonHandler(dm);
+    }
   },[dm])
+
 
 const onLoadMap = useCallback((map) => {
   setMapObj(map);
-  // drawingManagerHandler(map);
+
 }, [])
 
 const drawingManagerHandler = (map) => {
@@ -87,9 +97,11 @@ function refreshMap(map) {
   const height = map.getDiv().offsetHeight;
 
   if(!toggleOrthoPhoth) {
-  getOrthoPhoto(map, bounds2, width, height);
+    getOrthoPhoto(map, bounds2, width, height);
   }
-  setAIResultList(map, bounds2);
+  if(!dm) { 
+    getAIResultList(map, bounds2);
+  }
 }
 
 const getOrthoPhoto = (map, bound, width, heigth) => {
@@ -109,7 +121,7 @@ const getOrthoPhoto = (map, bound, width, heigth) => {
   }
 }
 
-function setAIResultList(map, bounds) {
+function getAIResultList(map, bounds) {
   const url = '/mosaic/get-ai-result-feature-list.do';
   const data = { bounds };
 
@@ -133,7 +145,7 @@ function setAIResultList(map, bounds) {
          bounds.push({lat, lng})
        }
       
-      polygonBuild = new window.google.maps.Polygon({
+      const polygonBuild = new window.google.maps.Polygon({
         map: map,
         paths: bounds,
         strokeColor: "#000000",
@@ -141,8 +153,6 @@ function setAIResultList(map, bounds) {
         fillColor: color,
         fillOpacity: 1,
         zIndex: 900,
-        editable: dm,
-        draggable: dm,
       })
       buildArr.push({
         id: i,
@@ -172,8 +182,8 @@ function setAIResultList(map, bounds) {
        fillColor: color,
        fillOpacity: 1,
        zIndex: 900,
-       editable: dm,
-       draggable: dm,
+       editable: false,
+       draggable: false,
      })
      loadArr.push({
       id: i,
@@ -216,7 +226,7 @@ function cleanUpPolygonLoad() {
   }
 }
 function onIdleMap() {
-  if (!dm) refreshMap(mapObj);
+  refreshMap(mapObj);
 }
 
   return( isLoaded && 

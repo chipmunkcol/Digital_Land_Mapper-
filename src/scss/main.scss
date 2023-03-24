@@ -2,6 +2,7 @@
 @use './components/leftPanel.scss';
 @use './components/googleMap.scss';
 @use './components/layout.scss';
+@use './components//modal.scss';
 
 *, *:before, *:after{
   box-sizing: border-box;
@@ -71,6 +72,7 @@ ul.pagination li {
   justify-content: center;
   align-items: center;
   font-size: 1rem;
+  cursor: pointer;
 }
 
 ul.pagination li:first-child{

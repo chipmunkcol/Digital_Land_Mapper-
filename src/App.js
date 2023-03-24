@@ -1,11 +1,12 @@
 import "./scss/main.css"
 import 로고 from "./asset/logo-komapper.png"
 import Map from "./components/Map";
-import Map2 from "./components/Map2";
-import Map3 from "./components/Map3";
 import LeftPanel from "./components/LeftPanel";
 import { useState } from "react";
 import LoginModal from "./components/LoginModal";
+import UploadModal from "./components/UploadModal";
+import { useRecoilValue } from "recoil";
+import { modalState } from "./store/common";
 
 function App() {
 
@@ -13,6 +14,8 @@ function App() {
   const loginHandler = () => {
     setLoginModal(true);
   }
+  const modalIsOpen = useRecoilValue(modalState);
+  console.log('modalIsOpen: ', modalIsOpen);
 
   return (
     <div className="container">
@@ -47,6 +50,9 @@ function App() {
     {/* 로그인 모달 컴포넌트 */}
       {loginModal && <LoginModal setLoginModal={setLoginModal}/>}
 
+    {/* 업로드 모달 컴포넌트 */}
+      {modalIsOpen && <UploadModal />}
+      
     </div>
   );
 }

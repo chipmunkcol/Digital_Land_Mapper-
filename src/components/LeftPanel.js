@@ -1,9 +1,11 @@
 import '../scss/main.css'
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { layerList } from "../db/data";
-import { centerState, drawingManager } from "../store/common";
-import { useEffect, useState } from 'react';
+import { centerState, drawingManager, modalState } from "../store/common";
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
+import { Scrollbar } from 'react-scrollbars-custom';
+import ProgressBar from '@ramonak/react-progress-bar';
 
 const LeftPanel = () => {
 
@@ -18,16 +20,22 @@ const LeftPanel = () => {
 
   return(
     <>
-    <div className="leftPanel">
-      {
-        item.slice((page - 1) * 8, page * 8).map((layer) => 
-          <LayerList 
-            key={layer.layerId}
-            layer={layer}
-          />
-        )
-      }
-      <Pagination 
+      <div className="leftPanel">
+        <Scrollbar style={{ width: '100%', height: 'calc(100% - 60px)' }}>
+        <div className='item-list'>
+          {
+            item.slice((page - 1) * 8, page * 8).map((layer, index) => 
+              <LayerList 
+                key={layer.layerId}
+                layer={layer}
+                index={index}
+              />
+            )
+          }
+        </div>
+        </Scrollbar>
+
+        <Pagination 
         activePage={ page }
         itemsCountPerPage={8}
         totalItemsCount={ totalCount }
@@ -35,25 +43,20 @@ const LeftPanel = () => {
         prevPageText={"<"}
         nextPageText={">"}
         onChange={ handlePageChange }
-      />
-
-    </div>
+        />
+      </div>
     </>
   )
 }
 
 export default LeftPanel;
 
-function LayerList({ layer }) {
-
-// const useState()
+function LayerList({ layer, index }) {
 
 const setDrawingManager = useSetRecoilState(drawingManager);
 
-const onClickTemplate = (layerId) => {
-  // if(layer.layerId === layerId) {
+const onClickTemplate = () => {
     setDrawingManager((prev) => !prev);
-  // }
 }
 
 const layerId = layer.layerId;
@@ -74,19 +77,65 @@ const getOrthoPhotoHandler = () => {
   }))
 }
 
+  // progressbar
+  const [completed, setCompleted] = useState(0);
+  const [downloadIndex, setDownloadIndex] = useState(null);
+  const intervalRef = useRef(null);
+  
+  const downloadHandler = (index) => {
+    setDownloadIndex(index);
+  }
+
+  useEffect(() => {
+    if(downloadIndex)
+      intervalRef.current = setInterval(() => {
+        setCompleted(completed => {
+          if (completed === 100) {
+            clearInterval(intervalRef.current);
+            return completed;
+          } else {
+            return completed + 10;
+          }
+        });
+      }, 1000);
+    
+    return () => clearInterval(intervalRef.current);
+  }, [downloadIndex]);
+  
+  // 업로드
+  const setModal = useSetRecoilState(modalState);
+
   return(
     <div className="layer_box" onClick={getOrthoPhotoHandler}>
       <div className="layer_title">{layerName}</div>
       <div className="layer_address">{layerAdress}</div>
       <div className="layer_btn_box">
+        <button className="layer_btn" onClick={ (e) => {setModal(prev => !prev); e.stopPropagation()} }>
+          업로드
+        </button>
+        
+        <button className="layer_btn" onClick={ (e) => {downloadHandler(index + 1); e.stopPropagation()} }>
+          다운로드
+        </button>
+        
         <button className="layer_btn" 
           onClick={(e)=>{
             e.stopPropagation();
-            onClickTemplate(layer.layerId)
+            onClickTemplate();
             }}>
               편집
         </button>
       </div>
+      <div className='progressbar'>
+        {
+          index + 1 === downloadIndex ?
+            <ProgressBar 
+              completed={ completed }
+              maxCompleted={ 100 }
+            /> : null
+        }
+      </div>
+      
     </div>
   )
 }
