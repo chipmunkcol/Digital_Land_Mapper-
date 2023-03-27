@@ -1,7 +1,7 @@
 import '../scss/main.css'
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { layerList } from "../db/data";
-import { centerState, drawingManager, modalState } from "../store/common";
+import { centerState, drawingManager, isProgressState, layerListState, modalState, progressState } from "../store/common";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { Scrollbar } from 'react-scrollbars-custom';
@@ -11,7 +11,8 @@ const LeftPanel = () => {
 
   // Pagination 구현하기
   const [page, setPage] = useState(1);
-  const [item, setItem] = useState(layerList);
+  // const [item, setItem] = useState(layerList);
+  const item = useRecoilValue(layerListState);
 
   const handlePageChange = (page) => {
     setPage(page);
@@ -26,9 +27,9 @@ const LeftPanel = () => {
           {
             item.slice((page - 1) * 8, page * 8).map((layer, index) => 
               <LayerList 
-                key={layer.layerId}
-                layer={layer}
-                index={index}
+                key={ layer.layerId }
+                layer={ layer }
+                index={ index }
               />
             )
           }
@@ -78,32 +79,14 @@ const getOrthoPhotoHandler = () => {
 }
 
   // progressbar
-  const [completed, setCompleted] = useState(0);
-  const [downloadIndex, setDownloadIndex] = useState(null);
-  const intervalRef = useRef(null);
+  // const [completed, setCompleted] = useState(0);
+  const progress = useRecoilValue(progressState);
+  const isProgress = useRecoilValue(isProgressState);
   
-  const downloadHandler = (index) => {
-    setDownloadIndex(index);
-  }
-
-  useEffect(() => {
-    if(downloadIndex)
-      intervalRef.current = setInterval(() => {
-        setCompleted(completed => {
-          if (completed === 100) {
-            clearInterval(intervalRef.current);
-            return completed;
-          } else {
-            return completed + 10;
-          }
-        });
-      }, 1000);
-    
-    return () => clearInterval(intervalRef.current);
-  }, [downloadIndex]);
   
   // 업로드
   const setModal = useSetRecoilState(modalState);
+  const item = useRecoilValue(layerListState);
 
   return(
     <div className="layer_box" onClick={getOrthoPhotoHandler}>
@@ -114,7 +97,7 @@ const getOrthoPhotoHandler = () => {
           업로드
         </button>
         
-        <button className="layer_btn" onClick={ (e) => {downloadHandler(index + 1); e.stopPropagation()} }>
+        <button className="layer_btn" onClick={ (e) => { e.stopPropagation()} }>
           다운로드
         </button>
         
@@ -128,36 +111,35 @@ const getOrthoPhotoHandler = () => {
       </div>
       <div className='progressbar'>
         {
-          index + 1 === downloadIndex ?
-            <ProgressBar 
-              completed={ completed }
-              maxCompleted={ 100 }
-            /> : null
+          isProgress && index === item.findIndex((v) => v.id === layer.id) &&
+          <ProgressBar 
+            completed={ progress }
+            maxCompleted={100}
+          />
         }
+        
       </div>
       
     </div>
   )
 }
 
+ // const downloadHandler = (index) => {
+  //   setDownloadIndex(index);
+  // }
 
-
-// const [isActive, setIsActive] = useState(null);
-// // const paginationArr = [1,2,3,4,5,6];
-
-// // 클릭한 index만 넘겨줘서 index 번호로 클릭 한 거 구분해주자 
-// const onclickActive = (index) => {
-//   setIsActive(index);
-// }
-
-// {
-//   paginationArr.map((number, index) => (
-//     <span
-//       key={number} 
-//       className={`page ${isActive === index ? 'active' : ''}`}
-//       onClick={ () => {onclickActive(index)} }
-//     >
-//       [{number}]
-//     </span>
-//   ))
-// } 
+  // useEffect(() => {
+  //   if(downloadIndex)
+  //     intervalRef.current = setInterval(() => {
+  //       setCompleted(completed => {
+  //         if (completed === 100) {
+  //           clearInterval(intervalRef.current);
+  //           return completed;
+  //         } else {
+  //           return completed + 10;
+  //         }
+  //       });
+  //     }, 1000);
+    
+  //   return () => clearInterval(intervalRef.current);
+  // }, [downloadIndex]);
