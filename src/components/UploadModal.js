@@ -13,7 +13,7 @@ const UploadModal = () => {
   const [progress, setProgress] = useRecoilState(progressState);
   const [layerList, setLayerList] = useRecoilState(layerListState);
   const setIsProgress = useSetRecoilState(isProgressState);
-  // const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null);
   // const imgRef = useRef(null);
 
   const closeModal = () => {
@@ -21,18 +21,25 @@ const UploadModal = () => {
   }
   
   const onChangeFileInput = (e) => {
-    const file = e.target.files;
+    setFile(e.target.files[0]);
+  };
+
+
+  const uploadFile_FB = async(e) => {
+    e.preventDefault();
+
     const storage = getStorage(app);
-    const fileRef = ref(storage, `images/${file[0].name}`);
-    const uploadTask = uploadBytesResumable(fileRef, file[0]);
-    let init = 0;
+    const fileRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(fileRef, file);
+    let My_init = true;
     uploadTask.on("state_changed",
       (snapshot) => {
-        if(!init) {
-          setIsProgress(true);
+        if(My_init) {
+          setIsOpen(false);
+
           const copy = [...layerList];
           const newLayer = {
-            layerId: new Date(),
+            layerId: String(Math.random()),
             name: 'test',
             address: 'test',
             bounds: [
@@ -41,10 +48,13 @@ const UploadModal = () => {
               127.51810227080813,
               37.494589190964874
             ],
+            fileName: file.name,
           }
           copy.unshift(newLayer);
           setLayerList(copy);
-          init = 1;
+          My_init = false;
+
+          setIsProgress(newLayer.layerId);
         }
         const progress_ = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
         setProgress(progress_);
@@ -54,44 +64,23 @@ const UploadModal = () => {
       },
       (complete) => {
         setIsProgress(false);
+        setProgress(complete + '업로드 완료');
       }
     );
-  };
-
-
-  const uploadFile_FB = async(e) => {
-    e.preventDefault();
-
-    console.log("보류")
-    // const imageFile = e.target.files;
-    // console.log('imageFile: ', imageFile);
-    
   }
 
 
   return(
     <div className="wrap" onClick={ closeModal }>
       <div className="modal" onClick={ (e) => { e.stopPropagation() } }>
-        {/* <form onSubmit={ uploadFile_FB }> */}
+        <form onSubmit={ uploadFile_FB }>
           <input 
           type="file" 
           accept="image/*"
-          // ref={imgRef} 
           onChange={ onChangeFileInput } 
           required/>
           <button type="submit">업로드</button>
-        {/* </form> */}
-        {/* <ProgressBar 
-        completed={ progress }
-        maxCompleted={100}
-        /> */}
-
-        {/* { imageUrl && 
-          <img src={ imageUrl } alt="firebase 업로드 imageURL"
-               width={200}
-               height={200}
-          />
-        } */}
+        </form>
       </div>
     </div>
   )

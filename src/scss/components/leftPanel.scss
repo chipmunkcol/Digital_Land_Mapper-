@@ -1,7 +1,22 @@
 .leftPanel {
   width: 100%;
   height: 100%;
-  
+  padding: 20px 0;
+
+  .btn-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  .upload-btn {
+    width: 100px;
+    height: 30px;
+    background-color: rgb(40, 40, 104);
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
   .item-list {
     height: calc(100% - 60px);
     overflow: auto;

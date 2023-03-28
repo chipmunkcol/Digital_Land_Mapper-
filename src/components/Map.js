@@ -58,7 +58,6 @@ const Map = () => {
 
 const onLoadMap = useCallback((map) => {
   setMapObj(map);
-
 }, [])
 
 const drawingManagerHandler = (map) => {

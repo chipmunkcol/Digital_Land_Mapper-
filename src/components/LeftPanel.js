@@ -1,11 +1,12 @@
 import '../scss/main.css'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { layerList } from "../db/data";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { centerState, drawingManager, isProgressState, layerListState, modalState, progressState } from "../store/common";
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { Scrollbar } from 'react-scrollbars-custom';
 import ProgressBar from '@ramonak/react-progress-bar';
+import { getDownloadURL, getStorage, ref } from 'firebase/storage';
+import { app } from '../api/firebase';
 
 const LeftPanel = () => {
 
@@ -13,6 +14,7 @@ const LeftPanel = () => {
   const [page, setPage] = useState(1);
   // const [item, setItem] = useState(layerList);
   const item = useRecoilValue(layerListState);
+  const setModal = useSetRecoilState(modalState);
 
   const handlePageChange = (page) => {
     setPage(page);
@@ -23,17 +25,22 @@ const LeftPanel = () => {
     <>
       <div className="leftPanel">
         <Scrollbar style={{ width: '100%', height: 'calc(100% - 60px)' }}>
-        <div className='item-list'>
-          {
-            item.slice((page - 1) * 8, page * 8).map((layer, index) => 
-              <LayerList 
-                key={ layer.layerId }
-                layer={ layer }
-                index={ index }
-              />
-            )
-          }
-        </div>
+          <div className='btn-wrap'>
+            <button className="upload-btn" onClick={ (e) => {setModal(prev => !prev); e.stopPropagation()} }>
+              업로드
+            </button>
+          </div>
+          <div className='item-list'>
+            {
+              item.slice((page - 1) * 8, page * 8).map((layer, index) => 
+                <LayerList 
+                  key={ layer.layerId }
+                  layer={ layer }
+                  index={ index }
+                />
+              )
+            }
+          </div>
         </Scrollbar>
 
         <Pagination 
@@ -63,6 +70,7 @@ const onClickTemplate = () => {
 const layerId = layer.layerId;
 const layerName = layer.name;
 const layerAdress = layer.address;
+const layerFileName = layer.fileName;
 const layerLat = (layer.bounds[1]+layer.bounds[3]) / 2;
 const layerLng = (layer.bounds[0]+layer.bounds[2]) / 2;
 
@@ -79,25 +87,38 @@ const getOrthoPhotoHandler = () => {
 }
 
   // progressbar
-  // const [completed, setCompleted] = useState(0);
   const progress = useRecoilValue(progressState);
   const isProgress = useRecoilValue(isProgressState);
-  
-  
-  // 업로드
-  const setModal = useSetRecoilState(modalState);
-  const item = useRecoilValue(layerListState);
+
+  // file download
+  const downloadHandler = (fileName) => {
+    const storage = getStorage(app);
+    getDownloadURL(ref(storage, `images/${fileName}`))
+      .then((url) => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (e) => {
+          console.log(e);
+          console.log(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.send();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
 
   return(
     <div className="layer_box" onClick={getOrthoPhotoHandler}>
       <div className="layer_title">{layerName}</div>
       <div className="layer_address">{layerAdress}</div>
       <div className="layer_btn_box">
-        <button className="layer_btn" onClick={ (e) => {setModal(prev => !prev); e.stopPropagation()} }>
+        {/* <button className="layer_btn" onClick={ (e) => {setModal(prev => !prev); e.stopPropagation()} }>
           업로드
-        </button>
+        </button> */}
         
-        <button className="layer_btn" onClick={ (e) => { e.stopPropagation()} }>
+        <button className="layer_btn" onClick={ (e) => { e.stopPropagation(); downloadHandler(layerFileName) } }>
           다운로드
         </button>
         
@@ -109,17 +130,16 @@ const getOrthoPhotoHandler = () => {
               편집
         </button>
       </div>
-      <div className='progressbar'>
         {
-          isProgress && index === item.findIndex((v) => v.id === layer.id) &&
-          <ProgressBar 
-            completed={ progress }
-            maxCompleted={100}
-          />
+          isProgress === layerId &&
+            <div className='progressbar'>
+               <ProgressBar 
+                completed={ progress }
+                maxCompleted={100}
+               />
+            </div>
         }
         
-      </div>
-      
     </div>
   )
 }

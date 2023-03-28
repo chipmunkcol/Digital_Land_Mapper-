@@ -52,5 +52,5 @@ export const layerListState = atom({
 
 export const isProgressState = atom({
   key: 'isProgressState',
-  default: false,
+  default: null,
 })
