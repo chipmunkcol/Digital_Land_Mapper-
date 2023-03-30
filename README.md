@@ -78,7 +78,10 @@ const editPolygonHandler = (dm) => {
 ```
 6. react js pagination
 
-7. Chat GPT
+7. Intersection Observer
+  - left panel modal창이 list 아래부분은 가려져서 observer 써서 해결.
+
+0. Chat GPT
   - 세상에나... google map docs 구려서 찾으려고 그렇게 노력하던 메서드들 gpt가 한번에 정리해줌
   - Q. react-google-maps/api 에서 polygon에 사용하는 메서드를 모두 알려줘
   - A. react-google-maps/api 패키지에서 제공하는 Polygon 컴포넌트에서 사용할 수 있는 메서드들은 다음과 같습니다:

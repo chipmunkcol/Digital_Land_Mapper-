@@ -43,7 +43,7 @@ function App() {
         <div className="map">
 
         {/* GoogleMap 컴포넌트 */}
-          <Map />
+          {/* <Map /> */}
         </div>
       </div>
 

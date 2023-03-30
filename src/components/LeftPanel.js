@@ -1,12 +1,13 @@
 import '../scss/main.css'
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { centerState, drawingManager, isProgressState, layerListState, modalState, progressState } from "../store/common";
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { Scrollbar } from 'react-scrollbars-custom';
 import ProgressBar from '@ramonak/react-progress-bar';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import { app } from '../api/firebase';
+import { useInView } from 'react-intersection-observer';
 
 const LeftPanel = () => {
 
@@ -32,7 +33,7 @@ const LeftPanel = () => {
           </div>
           <div className='item-list'>
             {
-              item.slice((page - 1) * 8, page * 8).map((layer, index) => 
+              item.slice((page - 1) * 10, page * 10).map((layer, index) => 
                 <LayerList 
                   key={ layer.layerId }
                   layer={ layer }
@@ -45,7 +46,7 @@ const LeftPanel = () => {
 
         <Pagination 
         activePage={ page }
-        itemsCountPerPage={8}
+        itemsCountPerPage={10}
         totalItemsCount={ totalCount }
         pageRangeDisplayed={5}
         prevPageText={"<"}
@@ -59,6 +60,9 @@ const LeftPanel = () => {
 
 export default LeftPanel;
 
+
+
+let menubarIndex = null;
 function LayerList({ layer, index }) {
 
 const setDrawingManager = useSetRecoilState(drawingManager);
@@ -90,38 +94,54 @@ const getOrthoPhotoHandler = () => {
   const progress = useRecoilValue(progressState);
   const isProgress = useRecoilValue(isProgressState);
 
-  // file download
-  const downloadHandler = (fileName) => {
-    const storage = getStorage(app);
-    getDownloadURL(ref(storage, `images/${fileName}`))
-      .then((url) => {
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.onload = (e) => {
-          console.log(e);
-          console.log(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.send();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+  
+  // menubar (상세보기 / 다운로드 / 편집)
+  const [isMenubar, setIsMenubar] = useState(false);
+  const handleCloseMenubar = () => {
+    if(isMenubar) {
+      setIsMenubar(false);
+    } 
+  }
+  const handleToggleMenubar = (index) => {
+    if(isMenubar && index === menubarIndex) {
+      setIsMenubar(false);
+    } 
+    if(!isMenubar) {
+      setIsMenubar(true);
+    }
+    menubarIndex = index;
   }
 
+  // intersection observer
+  const [inviewIndex, setInviewIndex] = useState(null);
+  // const [ref, inView, entry] = useInView({threshold: 0.5})
+  // console.log('ref: ', ref, 'inview: ', inView);
+
+  const obsRef = useRef(null);
+  
+
   return(
-    <div className="layer_box" onClick={getOrthoPhotoHandler}>
+    <div className="layer_box" onClick={() => { getOrthoPhotoHandler(); handleCloseMenubar()}}>
       <div className="layer_title">{layerName}</div>
       <div className="layer_address">{layerAdress}</div>
+      <i className={`menubar ${index === menubarIndex ? 'active' : ''}`} alt="상세보기/다운로드/편집menubar"
+         onClick={ (e) => { e.stopPropagation(); handleToggleMenubar(index); setInviewIndex(index)  } }
+      />
+
+      <div className="inView-check"
+          //  ref={ref}
+           >
+      {
+        isMenubar && index === menubarIndex &&
+          <div className={ `menubar-wrap ${ !inView ? 'last' : '' }` }>
+              <div className="menubar-btn" >상세보기</div>
+              <div className="menubar-btn" >다운로드</div>
+              <div className="menubar-btn-last" >편 집</div>
+          </div>
+      }
+      </div>
+
       <div className="layer_btn_box">
-        {/* <button className="layer_btn" onClick={ (e) => {setModal(prev => !prev); e.stopPropagation()} }>
-          업로드
-        </button> */}
-        
-        <button className="layer_btn" onClick={ (e) => { e.stopPropagation(); downloadHandler(layerFileName) } }>
-          다운로드
-        </button>
-        
         <button className="layer_btn" 
           onClick={(e)=>{
             e.stopPropagation();
@@ -163,3 +183,23 @@ const getOrthoPhotoHandler = () => {
     
   //   return () => clearInterval(intervalRef.current);
   // }, [downloadIndex]);
+
+
+  // file download (CORS 문제로 인해 보류)
+  // const downloadHandler = (fileName) => {
+  //   const storage = getStorage(app);
+  //   getDownloadURL(ref(storage, `images/${fileName}`))
+  //     .then((url) => {
+  //       const xhr = new XMLHttpRequest();
+  //       xhr.responseType = 'blob';
+  //       xhr.onload = (e) => {
+  //         console.log(e);
+  //         console.log(xhr.response);
+  //       };
+  //       xhr.open('GET', url);
+  //       xhr.send();
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     })
+  // }

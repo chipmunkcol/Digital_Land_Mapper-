@@ -19,7 +19,7 @@
 
   .item-list {
     height: calc(100% - 60px);
-    overflow: auto;
+    overflow: hidden;
   }
 
   .page{
@@ -34,7 +34,8 @@
   width: 100%;
   padding: 10px;
   border-bottom: 1px solid rgb(216, 216, 216);
-  
+  position: relative;
+
   .layer_title {
     font-size: 17px;
     font-weight: 600;
@@ -57,5 +58,80 @@
   .progressbar {
     margin-top: 10px;
   }
-  
+}
+
+.layer_box:hover .menubar {
+  opacity: 1;
+}
+
+
+/* menubar */
+.menubar,
+.menubar.active {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translate(0%, -50%);
+  background: url(../asset/menubar.svg) no-repeat;
+  background-size: 15px;
+  width: 28px;
+  height: 26px;
+  background-position: center;
+  border-radius: 3px;
+}
+.menubar {
+  background-color: #ffffff;
+  opacity: 0;
+}
+.menubar.active {
+  background-color: #e3e3e3;
+  opacity: 1;
+}
+
+.menubar:hover {
+  background-color: #e3e3e3;
+  /* #e3e3e3 */
+  /* #a7a7a7 */
+  /* #cccccc */
+}
+.inView-check {
+  position: absolute;
+  width: 130px;
+  height: 105px;
+  top: 70px;
+  right: 1px;
+}
+.menubar-wrap,
+.menubar-wrap.last {
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  width: 130px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 5px 10px 15px 0 rgb(0 0 0 / 10%);
+  z-index: 1;
+}
+.menubar-wrap.last {
+  top: -114px;
+  right: 41px;
+}
+.menubar-btn,
+.menubar-btn-last {
+  color: #000000;
+  font-size: 15px;
+  width: 100%;
+  height: 35px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+.menubar-btn {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.menubar-btn:hover,
+.menubar-btn-last:hover {
+  background-color: #e3e3e3;
 }
