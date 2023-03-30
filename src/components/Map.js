@@ -1,5 +1,5 @@
 import React, { Component, useCallback, useEffect, useRef } from "react";
-import { DrawingManager, DrawingManagerF, GoogleMap, useJsApiLoader,  } from "@react-google-maps/api";
+import { DrawingManager, DrawingManagerF, GoogleMap, GroundOverlay, GroundOverlayF, useJsApiLoader,  } from "@react-google-maps/api";
 import { useState } from "react";
 import "../scss/main.css"
 import axios from "axios";
@@ -7,7 +7,6 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { centerState, drawingManager, mapState } from "../store/common";
 import { axiosPost } from "../api/core";
 axios.defaults.withCredentials = true;
-
 const mapStyle = {
   width: '100%',
   height: '100%',
@@ -79,7 +78,7 @@ const drawingManagerHandler = (map) => {
   _dm.setMap(map);
 }
 
-
+let overlayBounds;
 function refreshMap(map) {
   const bounds = map.getBounds();
   const ne = bounds.getNorthEast();
@@ -91,7 +90,6 @@ function refreshMap(map) {
     east: ne.lng(),
     west: sw.lng(),
   }
-
   const width = map.getDiv().offsetWidth;
   const height = map.getDiv().offsetHeight;
 

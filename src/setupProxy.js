@@ -25,7 +25,7 @@ module.exports = (app) => {
       xfwd: true
     })
   );
-
+}
   /*
   app.use(
     createProxyMiddleware(proxyList, {
@@ -35,4 +35,4 @@ module.exports = (app) => {
     })
   );
   */
-}
+

@@ -1,7 +1,7 @@
 import '../scss/main.css'
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { centerState, drawingManager, isProgressState, layerListState, modalState, progressState } from "../store/common";
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { Scrollbar } from 'react-scrollbars-custom';
 import ProgressBar from '@ramonak/react-progress-bar';
@@ -113,12 +113,34 @@ const getOrthoPhotoHandler = () => {
   }
 
   // intersection observer
-  const [inviewIndex, setInviewIndex] = useState(null);
-  // const [ref, inView, entry] = useInView({threshold: 0.5})
   // console.log('ref: ', ref, 'inview: ', inView);
 
   const obsRef = useRef(null);
-  
+  const inViewRef = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(obsHandler, { threshold: 0.95 });
+    if(obsRef.current) {
+      observer.observe(obsRef.current);
+      console.log('obsRef: ', obsRef.current);
+    }
+    return () => {
+      observer.disconnect();
+    }
+  }, [])
+
+  const obsHandler = (entries) => {
+    entries.forEach((entry) => {
+      if(entry.isIntersecting) {
+        inViewRef.current = true;
+        console.log('inViewRef: ', inViewRef.current);
+      } else {
+        inViewRef.current = false;
+        console.log('inViewRef: ', inViewRef.current);
+      }
+    })
+    
+  }
 
   return(
     <div className="layer_box" onClick={() => { getOrthoPhotoHandler(); handleCloseMenubar()}}>
@@ -129,11 +151,11 @@ const getOrthoPhotoHandler = () => {
       />
 
       <div className="inView-check"
-          //  ref={ref}
+           ref={obsRef}
            >
       {
         isMenubar && index === menubarIndex &&
-          <div className={ `menubar-wrap ${ !inView ? 'last' : '' }` }>
+          <div className={ `menubar-wrap ${ !inViewRef.current ? 'last' : '' }` }>
               <div className="menubar-btn" >상세보기</div>
               <div className="menubar-btn" >다운로드</div>
               <div className="menubar-btn-last" >편 집</div>

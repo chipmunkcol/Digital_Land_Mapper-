@@ -63,8 +63,10 @@ const UploadModal = () => {
         console.log(err);
       },
       (complete) => {
-        setIsProgress(false);
         setProgress(complete + '업로드 완료');
+        setTimeout(() => {
+          setIsProgress(false);
+        }, 2000);
       }
     );
   }
