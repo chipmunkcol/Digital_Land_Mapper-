@@ -80,6 +80,50 @@ const editPolygonHandler = (dm) => {
 
 7. Intersection Observer
   - left panel modal창이 list 아래부분은 가려져서 observer 써서 해결.
+  
+8. 회원가입 시 에러 처리
+```
+ function signupHandler(e) {
+    e.preventDefault();
+    const id = idRef.current.value;
+    const pw = pwRef.current.value;
+    const pwCheck = pwCheckRef.current.value;
+
+    if (!id) {
+      setMessageId('※ Please Input your ID.');
+      return;
+    }
+    if (!pw) {
+      setMessagePw('※ Please Input your Password.');
+      return;
+    }
+    if (!pwCheck) {
+      setMessagePw('※ Please Input your Password check.');
+      return;
+    }
+    if (pw !== pwCheck) {
+      setMessagePw('※ Please write the same Password and Password check.');
+      return;
+    }
+}
+
+ function resetMessagePw() {
+    const pw = pwRef.current.value;
+    const pwCheck = pwCheckRef.current.value;
+
+    if (messagePw === '※ Please write the same Password and Password check.' && pw === pwCheck) {
+      setMessagePw(null);
+      return;
+    }
+    if (messagePw === '※ Please Input your Password check.' && pwCheck !== '') {
+      setMessagePw(null);
+      return;
+    } if (messagePw === '※ Please Input your Password.' && pw !== '') {
+      setMessagePw(null);
+      return;
+    }
+  }
+```
 
 0. Chat GPT
   - 세상에나... google map docs 구려서 찾으려고 그렇게 노력하던 메서드들 gpt가 한번에 정리해줌
