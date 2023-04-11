@@ -7,6 +7,7 @@ import LoginModal from "./components/LoginModal";
 import UploadModal from "./components/UploadModal";
 import { useRecoilValue } from "recoil";
 import { modalState } from "./store/common";
+import { getCookie, removeCookie, setCookie } from "./hooks/cookie";
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
   const modalIsOpen = useRecoilValue(modalState);
   console.log('modalIsOpen: ', modalIsOpen);
 
+
   return (
     <div className="container">
     {/* header 부분입니다 */}
@@ -25,6 +27,11 @@ function App() {
           <img src={로고} alt="(주)코매퍼 로고" width={"150"} height={"25.34"}/>
         </div>
         <span className="header_version">for LAND</span>
+
+        <button onClick={ () => setCookie('abcdefg') }>cookie set</button>
+        <button onClick={ getCookie }>cookie get</button>
+        <button onClick={ removeCookie }>cookie remove</button>
+
         <div className="login">
           <span onClick={loginHandler}>LOGIN</span>
         </div>
@@ -43,7 +50,7 @@ function App() {
         <div className="map">
 
         {/* GoogleMap 컴포넌트 */}
-          {/* <Map /> */}
+          <Map />
         </div>
       </div>
 

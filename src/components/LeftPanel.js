@@ -113,8 +113,6 @@ const getOrthoPhotoHandler = () => {
   }
 
   // intersection observer
-  // console.log('ref: ', ref, 'inview: ', inView);
-
   const obsRef = useRef(null);
   const inViewRef = useRef(false);
 
@@ -147,7 +145,7 @@ const getOrthoPhotoHandler = () => {
       <div className="layer_title">{layerName}</div>
       <div className="layer_address">{layerAdress}</div>
       <i className={`menubar ${index === menubarIndex ? 'active' : ''}`} alt="상세보기/다운로드/편집menubar"
-         onClick={ (e) => { e.stopPropagation(); handleToggleMenubar(index); setInviewIndex(index)  } }
+         onClick={ (e) => { e.stopPropagation(); handleToggleMenubar(index); } }
       />
 
       <div className="inView-check"
