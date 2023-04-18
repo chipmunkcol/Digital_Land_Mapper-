@@ -31,6 +31,49 @@ export const progressState = atom({
   default: 0,
 })
 
+export const isProgressState = atom({
+  key: 'isProgressState',
+  default: null,
+})
+
+export const testState = atom({
+  key: 'testState',
+  default: 1
+});
+
+export const testResultState = atom({
+  key: 'testResultState',
+  default: 0
+})
+
+export const testState2 = selector({
+  key:'testState2',
+  get: ({ get }) => {
+    // return get(testState) * 2;
+  },
+  set: ({get, set}) => {
+    const a = get(testState);
+    const testA = a + 10;
+    set(testResultState, testA);
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const layerListState = atom({
   key: 'layerListState',
   default: [{
@@ -69,9 +112,4 @@ export const layerListState = atom({
   {layerId: 'a785-cb1f-1aedb9cc-4ef318c125', name: '평림댐4', address: '전라남도 장성군', bounds: [126.68159215524777,35.28579793376968,126.68869695559032,35.28951254919848]},
   {layerId: 'a785-cb1f-1aedb9cc-4ef318c126', name: '평림댐4', address: '전라남도 장성군', bounds: [126.68159215524777,35.28579793376968,126.68869695559032,35.28951254919848]},
   ]
-})
-
-export const isProgressState = atom({
-  key: 'isProgressState',
-  default: null,
 })

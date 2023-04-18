@@ -120,7 +120,7 @@ const getOrthoPhotoHandler = () => {
     const observer = new IntersectionObserver(obsHandler, { threshold: 0.95 });
     if(obsRef.current) {
       observer.observe(obsRef.current);
-      console.log('obsRef: ', obsRef.current);
+      // console.log('obsRef: ', obsRef.current);
     }
     return () => {
       observer.disconnect();
@@ -131,10 +131,10 @@ const getOrthoPhotoHandler = () => {
     entries.forEach((entry) => {
       if(entry.isIntersecting) {
         inViewRef.current = true;
-        console.log('inViewRef: ', inViewRef.current);
+        // console.log('inViewRef: ', inViewRef.current);
       } else {
         inViewRef.current = false;
-        console.log('inViewRef: ', inViewRef.current);
+        // console.log('inViewRef: ', inViewRef.current);
       }
     })
     

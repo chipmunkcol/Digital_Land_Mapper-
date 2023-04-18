@@ -5,8 +5,8 @@ import LeftPanel from "./components/LeftPanel";
 import { useState } from "react";
 import LoginModal from "./components/LoginModal";
 import UploadModal from "./components/UploadModal";
-import { useRecoilValue } from "recoil";
-import { modalState } from "./store/common";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { modalState, testResultState, testState, testState2 } from "./store/common";
 import { getCookie, removeCookie, setCookie } from "./hooks/cookie";
 
 function App() {
@@ -17,6 +17,14 @@ function App() {
   }
   const modalIsOpen = useRecoilValue(modalState);
   console.log('modalIsOpen: ', modalIsOpen);
+
+  const [test, setTest] = useRecoilState(testState2);
+  const [result, setResult] = useRecoilState(testResultState);
+  console.log('result: ', result);
+
+  setTimeout(() => {
+    setTest(0);
+  }, 2000);
 
 
   return (
